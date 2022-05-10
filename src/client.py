@@ -1,3 +1,4 @@
+#Imports
 from fhirpy import SyncFHIRClient
 from fhir.resources.patient import Patient
 from fhir.resources.observation import Observation
@@ -7,14 +8,14 @@ from fhir.resources.contactpoint import ContactPoint
 
 import json
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------
+#Part 1----------------------------------------------------------------------------------------------------------------------------------------------------
 #Create our client connected to our server
 client = SyncFHIRClient(url='https://fhir.8ty581k3dgzj.static-test-account.isccloud.io', extra_headers={"x-api-key":"sVgCTspDTM4iHGn51K5JsaXAwJNmHkSG3ehxindk"})
 
 #Get the list of all our patient resources 
 patients_resources = client.resources('Patient')
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------
+#Part 2----------------------------------------------------------------------------------------------------------------------------------------------------
 #We want to create a patient and save it into our server
 
 #Create a new patient using fhir.resources
@@ -28,14 +29,15 @@ name.given = ["givenname1","givenname2"]
 
 patient0.name = [name]
 
-print(patient0)
+#Check our patient in the terminal
+print()
+print("Our patient : ",patient0)
+print()
 
 #Save (post) our patient0, it will create it in our server
-if patients_resources.search(family='familyname',given='givenname1').fetch() == []:
-    print("Patient created")
-    client.resource('Patient',**json.loads(patient0.json())).save()
+client.resource('Patient',**json.loads(patient0.json())).save()
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------
+#Part 3----------------------------------------------------------------------------------------------------------------------------------------------------
 #Now we want to get a certain patient and add his phone number and change his name before saving our changes in the server
 
 #Get the patient as a fhir.resources Patient of our list of patient resources who has the right name, for convenience we will use the patient we created before
@@ -54,15 +56,21 @@ patient0.telecom = [telecom]
 #Change the second given name of our patient to "anothergivenname"
 patient0.name[0].given[1] = "anothergivenname"
 
+#Check our Patient in the terminal
+print()
+print("Our patient with the phone number and the new given name : ",patient0)
+print()
+
 #Save (put) our patient0, this will save the phone number and the new given name to the existing patient of our server
 client.resource('Patient',**json.loads(patient0.json())).save()
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------
+#Part 4----------------------------------------------------------------------------------------------------------------------------------------------------
 #Now we want to create an observation for our client
 
 #Get the id of the patient you want to attach the observation to
 id = Patient.parse_obj(patients_resources.search(family='familyname',given='givenname1').first().serialize()).id
-print("id of our client : ",id)
+print("id of our patient : ",id)
+
 #Create a new observation using fhir.resources
 obj = {
         "resourceType": "Observation",
@@ -97,7 +105,6 @@ obj = {
           "code": "U/L"
         }
       }
-
 observation0 = Observation.parse_obj(obj)
 
 #Setting the reference to our patient using his id
