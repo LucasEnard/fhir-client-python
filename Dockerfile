@@ -12,6 +12,9 @@ RUN --mount=type=bind,src=.,dst=. \
 # create Python env
 ENV PYTHON_PATH=/usr/irissys/bin/irispython
 ENV SRC_PATH=/irisdev/app
+
+RUN pip3 install -r requirements.txt
+
 ENV IRISUSERNAME "SuperUser"
 ENV IRISPASSWORD "SYS"
 ENV IRISNAMESPACE "USER"
