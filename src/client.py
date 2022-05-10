@@ -10,7 +10,7 @@ import json
 
 #Part 1----------------------------------------------------------------------------------------------------------------------------------------------------
 #Create our client connected to our server
-client = SyncFHIRClient(url='https://fhir.8ty581k3dgzj.static-test-account.isccloud.io', extra_headers={"x-api-key":"sVgCTspDTM4iHGn51K5JsaXAwJNmHkSG3ehxindk"})
+client = SyncFHIRClient(url='url', extra_headers={"x-api-key":"api-key"})
 
 #Get the list of all our patient resources 
 patients_resources = client.resources('Patient')

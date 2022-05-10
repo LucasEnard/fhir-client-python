@@ -92,6 +92,16 @@ The code is separated in multiple parts, and we will cover each of them below.
 In this part we connect our client to our server using fhirpy and we get our Patient resources inside the variable `patients_resources`.<br>
 From this variable we will be able to fecth any Patient and even sort them or get a Patient using some conditions.
 
+In order to connect to your server you need to change the line :
+```python
+client = SyncFHIRClient(url='url', extra_headers={"x-api-key":"api-key"})
+```
+The `'url'` is an endpoint while the `"api-key"` is the api key to access your server.
+
+Note that if **you are not using** an InterSystems server you may want to change the `extra_headers={"x-api-key":"api-key"}` to `authorization = "api-key"`.<br>
+
+Just like that, we have a FHIR client capable of direct exchange with our server.
+
 ## 5.2. Part 2
 In this part we create a Patient using fhir.resources and we fill it with a HumanName, following the FHIR convention, `use` and `family` are string and `given` is a list of string. The same way, a Patient can have multiple HumanNames so we have to put our HumanName in a list before puting it into our newly created Patient.
 
