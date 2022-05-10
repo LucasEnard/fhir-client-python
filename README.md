@@ -93,22 +93,24 @@ In this part we connect our client to our server using fhirpy and we get our Pat
 From this variable we will be able to fecth any Patient and even sort them or get a Patient using some conditions.
 
 ## 5.2. Part 2
-In this part we create a Patient uing fhir.resources and we fill it with a HumanName, following the FHIR convention, `use` and `family` are string and `given` is a list of string. The same way, a Patient can have multiple HumanNames so we have to put our HumanName in a list before puting it into our newly created Patient.
+In this part we create a Patient using fhir.resources and we fill it with a HumanName, following the FHIR convention, `use` and `family` are string and `given` is a list of string. The same way, a Patient can have multiple HumanNames so we have to put our HumanName in a list before puting it into our newly created Patient.
 
 After that, we need to save our new Patient in our server using our client.
 
 Note that if you start `client.py` multiple times, multiple Patients having the name we choosed will be created.<br> This is because, following the FHIR convention you can have multiple Patient with the same name, only the `id` is unique on the server.<br>
 So why didn't we filled our Patient with an `id` the same way we filled his name ?<br> Because if you put an id inside the save() function, save will act as an updater before acting as a saver, and if the id is in fact not already in the server, it will create it as intended here. But since we already have Patients in our server it is not a good idea to create a new Patient and allocate by hand an id since the save() function and the server are made to do it for you.
 
+Therefore we advise to comment the line after the first launch.
+
 ## 5.3. Part 3
 In this part we get a client searching our `patients_resources` for a Patient named after the one we created earlier.
 
 Once we found him, we add a phone number to his profile and we change his second given name to another.
 
-Now we can save our Patient with the same function as earlier but this time, it will act as an updater and upadate in the server our Patient.
+Now we can save our Patient with the same function as earlier but this time, it will act as an updater and update in the server our Patient.
 
 ## 5.4. Part 4
-In this part we want to create a obeservation for our Patient from earlier, to do this, we first search our `patients_resources` for our Patient, then we get his id, which is his unique identifier.<br>
+In this part we want to create an observation for our Patient from earlier, to do this, we first search our `patients_resources` for our Patient, then we get his id, which is his unique identifier.<br>
 From here we use a json representation of our observation and add as the subject, the id of our Patient.
 
 Then, we register using the save() function our observation.

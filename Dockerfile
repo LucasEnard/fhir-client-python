@@ -9,6 +9,8 @@ RUN --mount=type=bind,src=.,dst=. \
 	iris session IRIS < iris.script && \
     iris stop IRIS quietly
 
+COPY . /irisdev/app
+
 # create Python env
 ENV PYTHON_PATH=/usr/irissys/bin/irispython
 ENV SRC_PATH=/irisdev/app
