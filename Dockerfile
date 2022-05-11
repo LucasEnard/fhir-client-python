@@ -1,22 +1,9 @@
-ARG IMAGE=intersystemsdc/iris-community
+# syntax=docker/dockerfile:1
 
-FROM $IMAGE
+FROM python:3.8.3
 
-WORKDIR /irisdev/app
+WORKDIR /code
 
-RUN --mount=type=bind,src=.,dst=. \
-    iris start IRIS && \
-	iris session IRIS < iris.script && \
-    iris stop IRIS quietly
+COPY . /code
 
-COPY . /irisdev/app
-
-# create Python env
-ENV PYTHON_PATH=/usr/irissys/bin/irispython
-ENV SRC_PATH=/irisdev/app
-
-RUN pip3 install -r requirements.txt
-
-ENV IRISUSERNAME "SuperUser"
-ENV IRISPASSWORD "SYS"
-ENV IRISNAMESPACE "USER"
+RUN python3 -m pip install -r requirements.txt

@@ -5,12 +5,16 @@ from fhir.resources.observation import Observation
 
 from fhir.resources.humanname import HumanName
 from fhir.resources.contactpoint import ContactPoint
+from fhir.resources.reference import Reference
+from fhir.resources.codeableconcept import CodeableConcept
+from fhir.resources.coding import Coding
+from fhir.resources.quantity import Quantity
 
 import json
 
 #Part 1----------------------------------------------------------------------------------------------------------------------------------------------------
-#Create our client connected to our server
-client = SyncFHIRClient(url='url', extra_headers={"x-api-key":"api-key"})
+#Create our client, connected to our server
+client = SyncFHIRClient(url='https://fhir.8ty581k3dgzj.static-test-account.isccloud.io', extra_headers={"x-api-key":"sVgCTspDTM4iHGn51K5JsaXAwJNmHkSG3ehxindk"})
 
 #Get the list of all our patient resources 
 patients_resources = client.resources('Patient')
@@ -19,7 +23,7 @@ patients_resources = client.resources('Patient')
 #We want to create a patient and save it into our server
 
 #Create a new patient using fhir.resources
-patient0 = Patient.parse_obj({})
+patient0 = Patient()
 
 #Create a HumanName and fill it with the information of our patient
 name = HumanName()
@@ -71,44 +75,50 @@ client.resource('Patient',**json.loads(patient0.json())).save()
 id = Patient.parse_obj(patients_resources.search(family='familyname',given='givenname1').first().serialize()).id
 print("id of our patient : ",id)
 
-#Create a new observation using fhir.resources
-obj = {
-        "resourceType": "Observation",
-        "status": "final",
-        "category": [
-          {
-            "coding": [
-              {
-                "system": "https://terminology.hl7.org/CodeSystem/observation-category",
-                "code": "laboratory",
-                "display": "laboratory"
-              }
-            ]
-          }
-        ],
-        "code": {
-          "coding": [
-            {
-              "system": "https://loinc.org",
-              "code": "1920-8",
-              "display": "Aspartate aminotransferase [Enzymatic activity/volume] in Serum or Plasma"
-            }
-          ],
-          "text": "Aspartate aminotransferase [Enzymatic activity/volume] in Serum or Plasma"
-        },
-        "effectiveDateTime": "2012-05-10T11:59:49+00:00",
-        "issued": "2012-05-10T11:59:49.565+00:00",
-        "valueQuantity": {
-          "value": 37.395,
-          "unit": "U/L",
-          "system": "https://unitsofmeasure.org",
-          "code": "U/L"
-        }
-      }
-observation0 = Observation.parse_obj(obj)
+#Set our code in our observation, code which hold codings which are composed of system, code and display
+coding = Coding()
+coding.system = "https://loinc.org"
+coding.code = "1920-8"
+coding.display = "Aspartate aminotransferase [Enzymatic activity/volume] in Serum or Plasma"
+code = CodeableConcept()
+code.coding = [coding]
+code.text = "Aspartate aminotransferase [Enzymatic activity/volume] in Serum or Plasma"
+
+#Create a new observation using fhir.resources, we enter status and code inside the constructor since theuy are necessary to validate an observation
+observation0 = Observation(status="final",code=code)
+
+#Set our category in our observation, category which hold codings which are composed of system, code and display
+coding = Coding()
+coding.system = "https://terminology.hl7.org/CodeSystem/observation-category"
+coding.code = "laboratory"
+coding.display = "laboratory"
+category = CodeableConcept()
+category.coding = [coding]
+observation0.category = [category]
+
+#Set our effective date time in our observation
+observation0.effectiveDateTime = "2012-05-10T11:59:49+00:00"
+
+#Set our issued date time in our observation
+observation0.issued = "2012-05-10T11:59:49.565+00:00"
+
+#Set our valueQuantity in our observation, valueQuantity which is made of a code, a unir, a system and a value
+valueQuantity = Quantity()
+valueQuantity.code = "U/L"
+valueQuantity.unit = "U/L"
+valueQuantity.system = "https://unitsofmeasure.org"
+valueQuantity.value = 37.395
+observation0.valueQuantity = valueQuantity
 
 #Setting the reference to our patient using his id
-observation0.subject = {"reference":f"Patient/{id}"}
+reference = Reference()
+reference.reference = f"Patient/{id}"
+observation0.subject = reference
+
+#Check our observation in the terminal
+print()
+print("Our observation : ",observation0)
+print()
 
 #Save (post) our observation0 using our client
 client.resource('Observation',**json.loads(observation0.json())).save()
