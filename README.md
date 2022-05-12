@@ -204,12 +204,12 @@ Open `/src/client.py` to start coding or using the autocompletion.
 
 ## 8.1. Dockerfile
 
-The simplest dockerfile to start IRIS.
-Use the related docker-compose.yml to easily setup additional parametes like port number and where you map keys and host folders.
+The simplest dockerfile to start a Python container.<br>
+Use `docker build .` to build and reopen your file in the container to work inside of it.
 
 ## 8.2. .vscode/settings.json
 
-Settings file to let you immedietly code in VSCode with [VSCode ObjectScript plugin](https://marketplace.visualstudio.com/items?itemName=daimor.vscode-objectscript))
+Settings file.
 
 ## 8.3. .vscode/launch.json
-Config file if you want to debug with VSCode ObjectScript
+Config file if you want to debug.
