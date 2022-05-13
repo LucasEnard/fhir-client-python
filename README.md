@@ -41,27 +41,29 @@ If you are not inside the container, you can use `pip` to install `fhirpy` and `
 
 Clone/git pull the repo into any local directory e.g. like it is shown below:
 ```
-$ git clone https://github.com/LucasEnard/benchmark-python-objectscript.git
+$ git clone https://github.com/LucasEnard/fhir-client-python.git
 ```
 
 Open the terminal in this directory and run:
 
 ```
-$ docker-compose up -d --build
+$ docker build .
 ```
 ## 3.2. Management Portal and VSCode
 
 This repository is ready for [VS Code](https://code.visualstudio.com/).
 
-Open the locally-cloned `benchmark-python-objectscript` folder in VS Code.
+Open the locally-cloned `fhir-client-python` folder in VS Code.
 
 If prompted (bottom right corner), install the recommended extensions.
 
 ## 3.3. Having the folder open inside the container
-**It is really important** to be *inside* the container before coding.<br>
+**It is important** to be *inside* the container before coding.<br>
 For this, docker must be on before opening VSCode.<br>
 Then, inside VSCode, when prompted (in the right bottom corner), reopen the folder inside the container so you will be able to use the python components within it.<br>
 The first time you do this it may take several minutes while the container is readied.
+
+If you don't have this option, you can click in the bottom left corner and `press reopen in container` then select `From Dockerfile`
 
 [More information here](https://code.visualstudio.com/docs/remote/containers)
 
@@ -69,9 +71,7 @@ The first time you do this it may take several minutes while the container is re
 
 <br><br><br>
 
-By opening the folder remote you enable VS Code and any terminals you open within it to use the python components within the container. Configure these to use `/usr/irissys/bin/irispython`
-
-<img width="1614" alt="PythonInterpreter" src="https://user-images.githubusercontent.com/47849411/145864423-2de24aaa-036c-4beb-bda0-3a73fe15ccbd.png">
+By opening the folder remote you enable VS Code and any terminals you open within it to use the python components within the container.
 
 # 4. FHIR server
 
