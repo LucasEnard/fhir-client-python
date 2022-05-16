@@ -41,13 +41,13 @@ If you are not inside the container, you can use `pip` to install `fhirpy` and `
 
 Clone/git pull the repo into any local directory e.g. like it is shown below:
 ```
-$ git clone https://github.com/LucasEnard/fhir-client-python.git
+git clone https://github.com/LucasEnard/fhir-client-python.git
 ```
 
 Open the terminal in this directory and run:
 
 ```
-$ docker build .
+docker build .
 ```
 ## 3.2. Management Portal and VSCode
 
