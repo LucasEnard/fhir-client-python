@@ -58,7 +58,7 @@ Open the locally-cloned `fhir-client-python` folder in VS Code.
 If prompted (bottom right corner), install the recommended extensions.
 
 ## 3.3. Having the folder open inside the container
-**It is important** to be *inside* the container before coding.<br>
+You can be *inside* the container before coding if you wish.<br>
 For this, docker must be on before opening VSCode.<br>
 Then, inside VSCode, when prompted (in the right bottom corner), reopen the folder inside the container so you will be able to use the python components within it.<br>
 The first time you do this it may take several minutes while the container is readied.
@@ -92,6 +92,15 @@ The code is separated in multiple parts, and we will cover each of them below.
 In this part we connect our client to our server using fhirpy and we get our Patient resources inside the variable `patients_resources`.<br>
 From this variable we will be able to fecth any Patient and even sort them or get a Patient using some conditions.
 
+```python
+#Part 1----------------------------------------------------------------------------------------------------------------------------------------------------
+#Create our client, connected to our server
+client = SyncFHIRClient(url='url', extra_headers={"x-api-key":"api-key"})
+
+#Get our patient resources in which we will be able to fecth and search
+patients_resources = client.resources('Patient')
+```
+
 In order to connect to your server you need to change the line :
 ```python
 client = SyncFHIRClient(url='url', extra_headers={"x-api-key":"api-key"})
@@ -105,6 +114,30 @@ Just like that, we have a FHIR client capable of direct exchange with our server
 ## 5.2. Part 2
 In this part we create a Patient using fhir.resources and we fill it with a HumanName, following the FHIR convention, `use` and `family` are string and `given` is a list of string. The same way, a Patient can have multiple HumanNames so we have to put our HumanName in a list before puting it into our newly created Patient.
 
+```python
+#Part 2----------------------------------------------------------------------------------------------------------------------------------------------------
+#We want to create a patient and save it into our server
+
+#Create a new patient using fhir.resources
+patient0 = Patient()
+
+#Create a HumanName and fill it with the information of our patient
+name = HumanName()
+name.use = "official"
+name.family = "familyname"
+name.given = ["givenname1","givenname2"]
+
+patient0.name = [name]
+
+#Check our patient in the terminal
+print()
+print("Our patient : ",patient0)
+print()
+
+#Save (post) our patient0, it will create it in our server
+client.resource('Patient',**json.loads(patient0.json())).save()
+```
+
 After that, we need to save our new Patient in our server using our client.
 
 Note that if you start `client.py` multiple times, multiple Patients having the name we choosed will be created.<br> This is because, following the FHIR convention you can have multiple Patient with the same name, only the `id` is unique on the server.<br>
@@ -115,13 +148,98 @@ Therefore we advise to comment the line after the first launch.
 ## 5.3. Part 3
 In this part we get a client searching our `patients_resources` for a Patient named after the one we created earlier.
 
+```python
+#Part 3----------------------------------------------------------------------------------------------------------------------------------------------------
+#Now we want to get a certain patient and add his phone number and change his name before saving our changes in the server
+
+#Get the patient as a fhir.resources Patient of our list of patient resources who has the right name, for convenience we will use the patient we created before
+patient0 = Patient.parse_obj(patients_resources.search(family='familyname',given='givenname1').first().serialize())
+
+#Create our patient new phone number
+telecom = ContactPoint()
+
+telecom.value = '555-748-7856'
+telecom.system = 'phone'
+telecom.use = 'home'
+
+#Add our patient phone to it's dossier
+patient0.telecom = [telecom]
+
+#Change the second given name of our patient to "anothergivenname"
+patient0.name[0].given[1] = "anothergivenname"
+
+#Check our Patient in the terminal
+print()
+print("Our patient with the phone number and the new given name : ",patient0)
+print()
+
+#Save (put) our patient0, this will save the phone number and the new given name to the existing patient of our server
+client.resource('Patient',**json.loads(patient0.json())).save()
+```
+
 Once we found him, we add a phone number to his profile and we change his second given name to another.
 
 Now we can save our Patient with the same function as earlier but this time, it will act as an updater and update in the server our Patient.
 
 ## 5.4. Part 4
 In this part we want to create an observation for our Patient from earlier, to do this, we first search our `patients_resources` for our Patient, then we get his id, which is his unique identifier.<br>
-From here we use a json representation of our observation and add as the subject, the id of our Patient.
+
+```python
+#Part 4----------------------------------------------------------------------------------------------------------------------------------------------------
+#Now we want to create an observation for our client
+
+#Get the id of the patient you want to attach the observation to
+id = Patient.parse_obj(patients_resources.search(family='familyname',given='givenname1').first().serialize()).id
+print("id of our patient : ",id)
+
+#Set our code in our observation, code which hold codings which are composed of system, code and display
+coding = Coding()
+coding.system = "https://loinc.org"
+coding.code = "1920-8"
+coding.display = "Aspartate aminotransferase [Enzymatic activity/volume] in Serum or Plasma"
+code = CodeableConcept()
+code.coding = [coding]
+code.text = "Aspartate aminotransferase [Enzymatic activity/volume] in Serum or Plasma"
+
+#Create a new observation using fhir.resources, we enter status and code inside the constructor since theuy are necessary to validate an observation
+observation0 = Observation(status="final",code=code)
+
+#Set our category in our observation, category which hold codings which are composed of system, code and display
+coding = Coding()
+coding.system = "https://terminology.hl7.org/CodeSystem/observation-category"
+coding.code = "laboratory"
+coding.display = "laboratory"
+category = CodeableConcept()
+category.coding = [coding]
+observation0.category = [category]
+
+#Set our effective date time in our observation
+observation0.effectiveDateTime = "2012-05-10T11:59:49+00:00"
+
+#Set our issued date time in our observation
+observation0.issued = "2012-05-10T11:59:49.565+00:00"
+
+#Set our valueQuantity in our observation, valueQuantity which is made of a code, a unir, a system and a value
+valueQuantity = Quantity()
+valueQuantity.code = "U/L"
+valueQuantity.unit = "U/L"
+valueQuantity.system = "https://unitsofmeasure.org"
+valueQuantity.value = 37.395
+observation0.valueQuantity = valueQuantity
+
+#Setting the reference to our patient using his id
+reference = Reference()
+reference.reference = f"Patient/{id}"
+observation0.subject = reference
+
+#Check our observation in the terminal
+print()
+print("Our observation : ",observation0)
+print()
+
+#Save (post) our observation0 using our client
+client.resource('Observation',**json.loads(observation0.json())).save()
+```
 
 Then, we register using the save() function our observation.
 
